@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Results</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p {
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .ping {
+            font-size: 12px;
+            color: green;
+        }
+
+        .ip {
+            font-size: 12px;
+        }
+
+        .branch {
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ping Results</h1>
+        <p>Local IP: <span id="local_ip"></span></p>
+        <table id="ping_table"> <!-- Add ID to the table -->
+            <thead>
+                <tr>
+                    <th>Branch</th>
+                    <th>IP Address</th>
+                    <th>Ping Time</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+        socket.on('update_ping_data', function(data) {
+            document.getElementById('local_ip').textContent = data.local_ip;
+    
+            var tbody = document.getElementById('ping_table').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+    
+            data.ping_data.forEach(function(entry) {
+                var row = tbody.insertRow();
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+    
+                cell1.textContent = entry.branch;
+                cell2.textContent = entry.ip;
+    
+                // Apply color based on ping value in milliseconds
+                if (entry.ping_colored > 10) {
+                    cell3.innerHTML = '<span class="ping" style="color: red;">' + entry.ping_colored + ' ms</span>';
+                } else {
+                    cell3.innerHTML = '<span class="ping" style="color: green;">' + entry.ping_colored + ' ms</span>';
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>
