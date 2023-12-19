@@ -35,11 +35,11 @@ def colorize_ping(ping_time):
     if ping_time is None:
         return 'Timeout'
     elif ping_time < 2:
-        return '{:.2f} '.format(ping_time)
+        return '{:.2f} ms'.format(ping_time)
     elif ping_time > 10:
-        return '{:.2f}'.format(ping_time)
+        return '{:.2f} ms'.format(ping_time)
     else:
-        return '{:.2f}'.format(ping_time)
+        return '{:.2f} ms'.format(ping_time)
 
 def update_ping_data():
     while True:
@@ -48,9 +48,9 @@ def update_ping_data():
         for branch, ip in branches.items():
             ping_time = ping(ip)
             ping_colored = colorize_ping(ping_time)
-            ping_data.append({'branch': branch, 'ip': ip, 'ping_colored': ping_colored})
+            ping_data.append({'branch': branch, 'ip': 'Hidden', 'ping_colored': ping_colored})  # Change 'ip' value
 
-        socketio.emit('update_ping_data', {'local_ip': get_local_ip(), 'ping_data': ping_data})
+        socketio.emit('update_ping_data', {'local_ip': 'Hidden', 'ping_data': ping_data})  # Change 'local_ip' value
         time.sleep(5)
 
 @app.route('/')
@@ -60,7 +60,7 @@ def index():
 @socketio.on('connect')
 def handle_connect():
     print('Client connected')
-    socketio.emit('update_ping_data', {'local_ip': get_local_ip(), 'ping_data': []})
+    socketio.emit('update_ping_data', {'local_ip': 'Hidden', 'ping_data': []})  # Change 'local_ip' value
 
 if __name__ == "__main__":
     threading.Thread(target=update_ping_data).start()
